@@ -12,31 +12,34 @@
       - python-dev
       - python-setuptools
       - python-virtualenv
+      - cmake
 
       # Zsh
       - zsh
 
-        #- name: Allow password authentication for local socket users
-        #  become: yes
-        #  become_method: sudo
-        #  copy: src=pg_hba.conf dest=/etc/postgresql/9.1/main/pg_hba.conf force=yes
-        #  notify:
-        #      - Restart Postgres
-        #
-        #- name: Create Database
-        #  become: yes
-        #  become_method: sudo
-        #  become_user: postgres
-        #  postgresql_db: name={{ db_name }}
-        #
-        #- name: Create User
-        #  become: yes
-        #  become_method: sudo
-        #  become_user: postgres
-        #  postgresql_user: name={{ db_user }} password={{ db_password }} state=present role_attr_flags=NOSUPERUSER,CREATEDB
-        #
-        #- name: Provide user with DB permissions
-        #  become: yes
-        #  become_method: sudo
-        #  become_user: postgres
-        #  postgresql_user: user={{ db_user }} db={{ db_name }} priv=ALL
+      # Git
+      - git
+
+- name: Clone oh-my-zsh
+  git: repo=https://github.com/robbyrussell/oh-my-zsh dest=~/.oh-my-zsh
+
+- name: Clone zsh-autosuggestions
+  git: repo=https://github.com/zsh-users/zsh-autosuggestions dest=~/.oh-my-zsh/zsh-autosuggestions
+
+- name: Clone zsh-syntax-highlighting
+  git: repo=https://github.com/zsh-users/zsh-syntax-highlighting dest=~/.oh-my-zsh/zsh-syntax-highlighting
+
+- name: Clone vundle
+  git: repo=https://github.com/VundleVim/Vundle.vim.git dest=~/.vim/bundle/Vundle.vim
+
+- name: Clone my dotFiles
+  git: repo=https://github.com/raydennis/dotFiles dest=~/.dotFiles
+
+- name: Copy dotFiles into home
+  command: cp -t ~/ ~/.dotFiles/.vimrc ~/.dotFiles/.zshrc
+
+  #- name: Install vundle plugins
+  #command: vim +PluginInstall +qall
+      
+  #- name: Compile autocomplete plugin
+  #command: python ~/.vim/bundle/YouCompleteMe/install.py
