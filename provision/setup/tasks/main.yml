@@ -12,6 +12,7 @@
       - python-dev
       - python-setuptools
       - python-virtualenv
+      - python-pip
       - cmake
 
       # Zsh
@@ -51,6 +52,26 @@
   apt: name=docker-engine update_cache=yes
 
 - service: name=docker state=restarted
+
+- name: Uninstall python docker
+  become: true
+  pip:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - docker-py
+    - docker
+
+- name: Install python docker
+  become: true
+  pip:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - docker
+
+- name: Add vagrant to docker user
+  command: usermod -a -G docker vagrant
 
 - name: start docker container (busybox)
   docker_container:
