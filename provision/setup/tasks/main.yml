@@ -4,7 +4,6 @@
   apt: pkg={{ item }} state=installed update_cache=yes
   with_items:
       # Database
-      - postgresql
       - libpq-dev # Required for Ansible to interact with postgres
       - python-psycopg2 # Required for Ansible to interact with postgres
 
@@ -15,29 +14,8 @@
       - python-pip
       - cmake
 
-      # Zsh
-      - zsh
-
       # Git
       - git
-
-- name: Clone oh-my-zsh
-  git: repo=https://github.com/robbyrussell/oh-my-zsh dest=~/.oh-my-zsh
-
-- name: Clone zsh-autosuggestions
-  git: repo=https://github.com/zsh-users/zsh-autosuggestions dest=~/.oh-my-zsh/zsh-autosuggestions
-
-- name: Clone zsh-syntax-highlighting
-  git: repo=https://github.com/zsh-users/zsh-syntax-highlighting dest=~/.oh-my-zsh/zsh-syntax-highlighting
-
-- name: Clone vundle
-  git: repo=https://github.com/VundleVim/Vundle.vim.git dest=~/.vim/bundle/Vundle.vim
-
-- name: Clone my dotFiles
-  git: repo=https://github.com/raydennis/dotFiles dest=~/.dotFiles
-
-- name: Copy dotFiles into home
-  command: cp -t ~/ ~/.dotFiles/.vimrc ~/.dotFiles/.zshrc
 
 - name: ensure repository key is installed
   apt_key:
