@@ -1,8 +1,11 @@
 - name: Install packages
   become: true
   become_method: sudo
-  apt: pkg={{ item }} state=installed update_cache=yes
+  apt: pkg={{ item }} state=present 
   with_items:
+      # GUI
+      - ubuntu-desktop
+
       # Database
       - libpq-dev # Required for Ansible to interact with postgres
       - python-psycopg2 # Required for Ansible to interact with postgres
@@ -17,36 +20,18 @@
       # Git
       - git
 
-- name: ensure repository key is installed
-  apt_key:
-    id: "58118E89F3A912897C070ADBF76221572C52609D"
-    keyserver: "hkp://p80.pool.sks-keyservers.net:80"
-    state: present
+      # Docker
+      - docker.io
 
-- name: ensure docker registry is available
-  apt_repository: repo='deb https://apt.dockerproject.org/repo ubuntu-trusty main' state=present
-
-- name: ensure docker and dependencies are installed
-  apt: name=docker-engine update_cache=yes
-
-- service: name=docker state=restarted
-
-- name: Uninstall python docker
-  become: true
+- name: install docker-py
   pip:
-    name: "{{ item }}"
-    state: absent
-  with_items:
-    - docker-py
-    - docker
+    name: docker-py
 
-- name: Install python docker
-  become: true
-  pip:
-    name: "{{ item }}"
-    state: latest
-  with_items:
-    - docker
+- name: ensure docker is running
+  systemd: 
+    name: docker
+    state: started
+    enabled: yes
 
 - name: Add vagrant to docker user
   command: usermod -a -G docker vagrant
@@ -60,7 +45,6 @@
 
 - name: install pycharm-professional via snap
   command: snap install pycharm-professional --classic --edge
-
 
 - name: install intellij-idea-ultimate via snap
   command: snap install intellij-idea-ultimate --classic

@@ -10,7 +10,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "ubuntu/xenial64"
+  config.vm.box = "ubuntu/bionic64"
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
@@ -36,7 +36,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Display the VirtualBox GUI when booting the machine
     vb.gui = true
       # Customize the amount of memory on the VM:
-    vb.memory = "1024"
+    vb.memory = "8192"
     # https://github.com/joelhandwell/ubuntu_vagrant_boxes/issues/1
     # Basebox ubuntu/xenial64 comes with following Vagrantfile config and causes https://github.com/joelhandwell/ubuntu_vagrant_boxes/issues/1
     # vb.customize [ "modifyvm", :id, "--uart1", "0x3F8", "4" ]
