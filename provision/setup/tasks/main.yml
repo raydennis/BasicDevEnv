@@ -57,3 +57,10 @@
     image: busybox
     volumes:
       - /data
+
+- name: install pycharm-professional via snap
+  command: snap install pycharm-professional --classic --edge
+
+
+- name: install intellij-idea-ultimate via snap
+  command: snap install intellij-idea-ultimate --classic
