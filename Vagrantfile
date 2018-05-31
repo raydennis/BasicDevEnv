@@ -20,17 +20,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
   # your network.
-  config.vm.network "public_network"
+  # config.vm.network "public_network"
 
   # If true, then any SSH connections made will enable agent forwarding.
   # Default value: false
-  config.ssh.forward_agent = true
+  config.ssh.forward_agent = false
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
-  config.vm.synced_folder "./app", "/var/www/django-app"
+  #  config.vm.synced_folder "./app", "/var/www/django-app"
 
   config.vm.provider "virtualbox" do |vb|
     # Display the VirtualBox GUI when booting the machine
@@ -42,7 +42,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # vb.customize [ "modifyvm", :id, "--uart1", "0x3F8", "4" ]
     # vb.customize [ "modifyvm", :id, "--uartmode1", "file", File.join(Dir.pwd, "ubuntu-xenial-16.04-cloudimg-console.log") ]
     # following config will address the issue
-    vb.customize [ "modifyvm", :id, "--uartmode1", "disconnected" ]
+    # vb.customize [ "modifyvm", :id, "--uartmode1", "disconnected" ]
   end
 
 # Install required software, depencencies and configurations on the 
