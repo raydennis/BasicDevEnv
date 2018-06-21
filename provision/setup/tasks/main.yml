@@ -1,6 +1,5 @@
-- name: set the stable docker repository
-  apt_repository:
-    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
+- name: "resize my ext4 filesystem, please"
+  command: resize2fs /dev/sda1 
 
 - name: Update all packages to the latest version
   apt:
@@ -38,49 +37,6 @@
       - gnupg2
       - software-properties-common
 
-# - name: Debian add docker key
-#   apt_key:
-#     url: https://download.docker.com/linux/debian/gpg
-#     state: present
-#   become: true
-#   when: "ansible_distribution == 'Debian'"
-
-- name: Ubuntu add docker key
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
-  become: true
-
-- name: add docker repo
-  apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    state: present
-  become: true
-
-- name: Update all packages to the latest version
-  apt:
-    upgrade: dist
-
-- name: Install packages
-  become: true
-  become_method: sudo
-  apt:
-    name: "{{ item }}"
-    state: present
-  with_items:
-      # Docker
-      - docker-ce
-
-- name: Add vagrant to docker user
-  command: usermod -a -G docker vagrant
-
-- name: start docker container (busybox)
-  docker_container:
-    name: mydata
-    image: busybox
-    volumes:
-      - /data
-
 - name: install pycharm-professional via snap
   command: snap install pycharm-professional --classic --edge
 
@@ -91,4 +47,58 @@
   timezone:
     name: America/Denver
 
+- name: Get upstream APT GPG key
+  apt_key:
+    id: "{{ docker_apt_key }}"
+    keyserver: "{{ ansible_local.core.keyserver
+                   if (ansible_local|d() and ansible_local.core|d() and
+                       ansible_local.core.keyserver)
+                   else 'hkp://pool.sks-keyservers.net' }}"
+    state: "present"
+
+- name: Configure upstream APT repository
+  apt_repository:
+    repo: "{{ docker_repository }}"
+    state: "present"
+    update_cache: True
+
+- name: Install Docker
+  apt:
+    name: "docker-{{ docker_edition }}"
+    # specific version example name: "docker-{{ docker_edition }}={{ docker_apt_package_name }}"
+    state: "present"
+    update_cache: True
+    install_recommends: False
+    cache_valid_time: "{{ docker_apt_cache_time }}"
+
+- name: Remove Upstart config file
+  file:
+    path: "/etc/default/docker"
+    state: "absent"
+
+- name: Ensure systemd directory exists
+  file:
+    path: "/etc/systemd/system"
+    state: "directory"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+
+- name: Add specific users to "docker" group
+  user:
+    name: "{{ item }}"
+    groups: "docker"
+    append: True
+  with_items: "{{ docker_users }}"
+  when: docker_users
+
+- name: Install Docker Compose
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64"
+    dest: "/usr/local/bin/docker-compose"
+    force: True
+    owner: "root"
+    group: "root"
+    mode: "0755"
+  when: docker_install_docker_compose
 
