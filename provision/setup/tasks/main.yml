@@ -1,4 +1,12 @@
-- name: Install packages
+- name: set the stable docker repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+
+- name: Install dependencies
   become: true
   become_method: sudo
   apt: pkg={{ item }} state=present 
@@ -6,9 +14,9 @@
       # GUI
       - ubuntu-desktop
 
-      # Database
-      - libpq-dev # Required for Ansible to interact with postgres
-      - python-psycopg2 # Required for Ansible to interact with postgres
+      # VirtualBox
+      - virtualbox-guest-utils
+      - virtualbox-guest-dkms
 
       # Python Dev
       - python-dev
@@ -20,18 +28,48 @@
       # Git
       - git
 
+      # Vim with clipboard support
+      - vim-gtk
+
       # Docker
-      - docker.io
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg2
+      - software-properties-common
 
-- name: install docker-py
-  pip:
-    name: docker-py
+# - name: Debian add docker key
+#   apt_key:
+#     url: https://download.docker.com/linux/debian/gpg
+#     state: present
+#   become: true
+#   when: "ansible_distribution == 'Debian'"
 
-- name: ensure docker is running
-  systemd: 
-    name: docker
-    state: started
-    enabled: yes
+- name: Ubuntu add docker key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  become: true
+
+- name: add docker repo
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    state: present
+  become: true
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+
+- name: Install packages
+  become: true
+  become_method: sudo
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+      # Docker
+      - docker-ce
 
 - name: Add vagrant to docker user
   command: usermod -a -G docker vagrant
@@ -48,3 +86,9 @@
 
 - name: install intellij-idea-ultimate via snap
   command: snap install intellij-idea-ultimate --classic
+
+- name: set timezone to America/Denver
+  timezone:
+    name: America/Denver
+
+
