@@ -1,6 +1,7 @@
 # Vagrant
 .vagrant/
 provision/vagrant.retry
+ubuntu-bionic-18.04-cloudimg-console.log
 
 # Python
 bin/
